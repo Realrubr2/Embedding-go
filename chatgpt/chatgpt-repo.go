@@ -1,4 +1,4 @@
-package repo
+package chatgpt
 
 import (
 	"bytes"
@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-// OpenAI API Key (store securely!)
+
 const openAIKey = ""
 
 // GenerateEmbeddings creates a 1536-dimensional vector for a movie

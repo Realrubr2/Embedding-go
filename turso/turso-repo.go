@@ -1,4 +1,4 @@
-package repo
+package turso
 
 import (
 	"database/sql"
@@ -62,6 +62,8 @@ func CreateContent(db *sql.DB, content Content) {
 		fmt.Fprintf(os.Stderr, "Failed to execute query: %v\n", err)
 		os.Exit(1)
 	}
+
+
 	fmt.Println("Content inserted successfully:", content.ID)
 }
 

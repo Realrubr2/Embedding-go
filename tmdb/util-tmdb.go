@@ -1,4 +1,4 @@
-package repo
+package tmdb
 import (
 	"encoding/json"
 	"fmt"
@@ -7,16 +7,17 @@ import (
 	"log"
 	"os"
 	"strings"
+	"embeddings/turso"
 )
 
 const APIKey = ""
 
-func convertMovieToContent(movie Movie) Content {
+func convertMovieToContent(movie Movie) turso.Content {
 	// Convert genre slice to a single comma-separated string
 	genreString := strings.Join(movie.Genres, ", ")
 
 	// Convert `Movie` to `Content`
-	content := Content{
+	content := turso.Content{
 		ID:          movie.ID,
 		Title:       movie.Title,
 		Genres:      genreString, // Store as a single string

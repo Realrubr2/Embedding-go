@@ -1,15 +1,15 @@
-package repo
+package tmdb
 
 import (
 	"database/sql"
+	"embeddings/chatgpt"
+	"embeddings/turso"
+	"embeddings/util"
 	"fmt"
 	"time"
 )
 
 const BaseURL = "https://api.themoviedb.org/3"
-
-
-
 
 type Movie struct {
 	ID          int      `json:"id"`
@@ -18,7 +18,7 @@ type Movie struct {
 	ReleaseDate string   `json:"release_date"`
 	Description string   `json:"overview"`
 	Provider    string   `json:"provider,omitempty"`
-	ImageLink string	 `json:"image_Path"`
+	ImageLink   string   `json:"image_Path"`
 }
 
 type Genre struct {
@@ -28,15 +28,14 @@ type Genre struct {
 
 var genreMap = make(map[int]string)
 
-
 func Movies(db *sql.DB) {
 	start := time.Now()
-		// Fetch the genres
-		if err := fetchGenresMovie(); err != nil {
-			fmt.Println("Error fetching genres:", err)
-			return
-		}
-			// Fetch popular movies
+	// Fetch the genres
+	if err := fetchGenresMovie(); err != nil {
+		fmt.Println("Error fetching genres:", err)
+		return
+	}
+	// Fetch popular movies
 	movies, err := fetchPopularMovies()
 	if err != nil {
 		fmt.Println("Error fetching movies:", err)
@@ -49,37 +48,38 @@ func Movies(db *sql.DB) {
 			movies[i].Provider = provider
 		}
 
-		content := convertMovieToContent(movies[i]) 
-		CreateContent(db, content)
-		
+		content := convertMovieToContent(movies[i])
+		turso.CreateContent(db, content)
+		err = util.AppendJSONToFile("movies", content)
+		if err != nil {
+			fmt.Println("error in creating json", err)
+		}
 
-		embeddingVector, err := GenerateEmbeddings(movies[i].Title, movies[i].Description, content.Genres, "movie")
+		embeddingVector, err := chatgpt.GenerateEmbeddings(movies[i].Title, movies[i].Description, content.Genres, "movie")
 		if err != nil {
 			fmt.Println("Error generating embedding for:", movies[i].Title, err)
 		}
-		
-		
-		embeddingObj := Embeddings{
+
+		embeddingObj := turso.Embeddings{
 			Content_ID: movies[i].ID,
-			Vector:    embeddingVector, 
+			Vector:     embeddingVector,
 		}
-		
-		
-		CreateEmbeddings(db, embeddingObj)
+
+		turso.CreateEmbeddings(db, embeddingObj)
 	}
 	fmt.Println("Execution Time:", time.Since(start))
 }
 
-func Shows(db *sql.DB){
+func Shows(db *sql.DB) {
 	start := time.Now()
-			// Fetch the genre's
-			if err := fetchGenresShow(); err != nil {
-				fmt.Println("Error fetching genres:", err)
-				return
-			}
+	// Fetch the genre's
+	if err := fetchGenresShow(); err != nil {
+		fmt.Println("Error fetching genres:", err)
+		return
+	}
 
-			//Fetches all the popular shows
-			shows, err := fetchPopularShows()
+	//Fetches all the popular shows
+	shows, err := fetchPopularShows()
 	if err != nil {
 		fmt.Println("Error fetching movies:", err)
 		return
@@ -92,24 +92,30 @@ func Shows(db *sql.DB){
 		if err == nil {
 			shows[i].Provider = provider
 		}
+		if provider != "Unknown" && provider != "" {
+			err = util.AppendJSONToFile("shows", shows[i])
+			if err != nil {
+				fmt.Println("error in creating json", err)
+			}
+		}
+		// content := convertMovieToContent(shows[i])
+		turso.CreateContent(db, shows[i])
 
-		// content := convertMovieToContent(shows[i]) 
-		CreateContent(db, shows[i])                
-		
-		embeddingVector, err := GenerateEmbeddings(shows[i].Title, shows[i].Description, shows[i].Genres, shows[i].Type)
+
+		embeddingVector, err := chatgpt.GenerateEmbeddings(shows[i].Title, shows[i].Description, shows[i].Genres, shows[i].Type)
 		if err != nil {
 			fmt.Println("Error generating embedding for:", shows[i].Title, err)
 		}
 
 		// Create embedding object
-		embeddingObj := Embeddings{
+		embeddingObj := turso.Embeddings{
 			Content_ID: shows[i].ID,
-			Vector:    embeddingVector, // Direct float array
+			Vector:     embeddingVector, // Direct float array
 		}
-		
+
 		// Insert embedding into DB
-		CreateEmbeddings(db, embeddingObj)
+		turso.CreateEmbeddings(db, embeddingObj)
 	}
-	
+
 	fmt.Println("Execution Time:", time.Since(start))
 }

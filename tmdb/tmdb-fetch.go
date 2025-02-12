@@ -1,9 +1,9 @@
-package repo
+package tmdb
 
 import (
+	"embeddings/turso"
 	"encoding/json"
 	"fmt"
-
 )
 
 // Fetches popular movies from TMDB
@@ -43,7 +43,7 @@ func fetchPopularMovies() ([]Movie, error) {
 	return movies, nil
 }
 
-func fetchPopularShows() ([]Content, error) {
+func fetchPopularShows() ([]turso.Content, error) {
 	url := fmt.Sprintf("%s/tv/popular?language=en-US&page=1", BaseURL)
 	data, err :=makeRequest(url)
 	if err != nil {
@@ -65,12 +65,12 @@ func fetchPopularShows() ([]Content, error) {
 	}
 
 
-	var tvShows []Content
+	var tvShows []turso.Content
 	for _, r := range response.Results {
 		if r.Overview == "" { // Skip if Overview is empty
 			r.Overview = "Sorry we dont have a desription for this show"
 		}
-		tvShows = append(tvShows, Content{
+		tvShows = append(tvShows, turso.Content{
 			ID:          r.ID,
 			Title:       r.Title,
 			Genres:      mapGenreIDToString(r.GenreIDs),

@@ -9,8 +9,8 @@ import (
 )
 func RunTursoDB(){
 	dbName := "local.db"
-    primaryUrl := ""
-    authToken := ""
+    primaryUrl := "https://embeddings-realrubr2.turso.io"
+    authToken := "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJxVHFEVk9KR0VlLWVqeG9vV1FBbTFRIn0.OQ1MLWN8ztbZQPe5H31E1tc3PAAFH6hBCTqqo7g_39SQfURH47qA2rHObsg64j75KcVhCMU83U6Ko7Jg7DTlAw"
 
     dir, err := os.MkdirTemp("", "libsql-*")
     if err != nil {
