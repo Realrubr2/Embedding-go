@@ -2,9 +2,8 @@ package main
 
 import (
 	"database/sql"
-	"embeddings/tmdb"
+	"embeddings/scrape"
 
-	// "embeddings/util"
 	"fmt"
 	"os"
 
@@ -26,9 +25,6 @@ func main() {
       os.Exit(1)
     }
 
-	  // tmdb.Movies(db)
-    tmdb.Shows(db)
-    // util.TranslateDescription()
-  
+    scrape.Scraper(db)
     defer db.Close()
 }

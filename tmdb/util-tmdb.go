@@ -7,28 +7,11 @@ import (
 	"log"
 	"os"
 	"strings"
-	"embeddings/turso"
 )
 
 const APIKey = ""
 
-func convertMovieToContent(movie Movie) turso.Content {
-	// Convert genre slice to a single comma-separated string
-	genreString := strings.Join(movie.Genres, ", ")
 
-	// Convert `Movie` to `Content`
-	content := turso.Content{
-		ID:          movie.ID,
-		Title:       movie.Title,
-		Genres:      genreString, // Store as a single string
-		Description: movie.Description,
-		ImageLink:   movie.ImageLink,
-		ReleaseDate: movie.ReleaseDate,
-		Provider:    movie.Provider,
-		Type:        "movie", // Explicitly setting the type
-	}
-	return content
-}
 //maps genreid to string it updates the mapgenreidstonames, it really calls for a refactor...
 func mapGenreIDToString(ids []int)string{
 	var names []string
@@ -41,16 +24,6 @@ func mapGenreIDToString(ids []int)string{
 	return genreString
 }
 
-// Maps genre IDs to genre names
-func mapGenreIDsToNames(ids []int) []string {
-	var names []string
-	for _, id := range ids {
-		if name, exists := genreMap[id]; exists {
-			names = append(names, name)
-		}
-	}
-	return names
-}
 
 // Makes an HTTP GET request and returns the response body
 func makeRequest(url string) ([]byte, error) {
