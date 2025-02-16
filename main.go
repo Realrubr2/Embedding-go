@@ -3,7 +3,7 @@ package main
 import (
 	"database/sql"
 	"embeddings/scrape"
-
+	"embeddings/util"
 	"fmt"
 	"os"
 
@@ -11,13 +11,11 @@ import (
 )
 
 
-
 func main() {
 
-	// dbName := "local.db"
-    primaryUrl := "libsql://embeddings-realrubr2.turso.io"
-    authToken := ""
-
+    env := util.LoadEnviroment()
+    primaryUrl := env[3]
+    authToken := env[2]
     url := fmt.Sprintf("%s?authToken=%s", primaryUrl, authToken)
     db, err := sql.Open("libsql", url)
     if err != nil {

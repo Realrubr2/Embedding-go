@@ -4,7 +4,7 @@ go 1.23.4
 
 require (
 	github.com/PuerkitoBio/goquery v1.10.1
-	github.com/sashabaranov/go-openai v1.37.0
+	github.com/joho/godotenv v1.5.1
 	github.com/tursodatabase/go-libsql v0.0.0-20241221181756-6121e81fbf92
 	github.com/tursodatabase/libsql-client-go v0.0.0-20240902231107-85af5b9d094d
 )

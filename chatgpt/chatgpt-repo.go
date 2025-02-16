@@ -2,14 +2,12 @@ package chatgpt
 
 import (
 	"bytes"
+	"embeddings/util"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 )
-
-
-const openAIKey = ""
 
 // GenerateEmbeddings creates a 1536-dimensional vector for a movie
 func GenerateEmbeddings(title string, description string, genres string, content_type string) ([]float64, error) {
@@ -24,7 +22,8 @@ func GenerateEmbeddings(title string, description string, genres string, content
 		"input": text,
 		"model": "text-embedding-ada-002", // OpenAI's embedding model
 	})
-
+		env := util.LoadEnviroment()
+		openAIKey := env[0]
 	// Create HTTP request
 	req, _ := http.NewRequest("POST", url, bytes.NewBuffer(requestBody))
 	req.Header.Set("Authorization", "Bearer "+openAIKey)

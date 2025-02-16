@@ -9,7 +9,7 @@ import (
 )
 
 // this wil be the function used -----------
-func FetchShowByTitle(movieTitle string) (turso.Content, error) {
+func FetchShowByTitle(movieTitle string, provider string) (turso.Content, error) {
 	encodedTitle := strings.ReplaceAll(movieTitle, " ", "%20")
 	url := fmt.Sprintf("%s/search/tv?query=%s&include_adult=true&language=en-US&page=1", BaseURL, encodedTitle)
 	data, err := makeRequest(url)
@@ -40,15 +40,16 @@ func FetchShowByTitle(movieTitle string) (turso.Content, error) {
 			Genres:      mapGenreIDToString(show.GenreIDs),
 			ReleaseDate: show.ReleaseDate,
 		Description: show.Overview,
-		ImageLink:   fmt.Sprintf("https://image.tmdb.org/t/p/w500%s", show.Poster),
-		Type:        "TV Show",
+		Provider: provider,
+		ImageLink:   show.Poster,
+		Type:        "show",
 	}
 	
 	return content, nil
 }
 
 
-func fetchGenresShow() error {
+func FetchGenresShow() error {
 	url := fmt.Sprintf("%s/genre/tv/list?language=en", BaseURL)
 	data, err := makeRequest(url)
 	if err != nil {

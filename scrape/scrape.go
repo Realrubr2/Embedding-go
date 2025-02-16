@@ -83,7 +83,7 @@ func Scraper(db *sql.DB) {
 	}
 	
 	scrapedTitles := scrapeTitles(html)
-	contentArr, err := ScrapeToContent(scrapedTitles)
+	contentArr, err := ScrapeToContent(scrapedTitles, "netflix")
 	if err != nil {		
 		log.Fatal("error in getting content", err)
 	}

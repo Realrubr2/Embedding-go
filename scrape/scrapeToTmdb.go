@@ -6,27 +6,28 @@ import (
 	"embeddings/tmdb"
 	"embeddings/turso"
 	"errors"
-	"fmt"
 	"log"
+	"fmt"
 )
 
 // this function takes the scraped titles and searches them in tmdb to get the content info
-func ScrapeToContent(extractedData []string) ([]turso.Content, error) {
+func ScrapeToContent(extractedData []string, provider string) ([]turso.Content, error) {
 	contentArr := []turso.Content{}
-
+	// first we need to fetch the genre to make a map of the id's
+	if err := tmdb.FetchGenresShow(); err != nil {
+		fmt.Println("Error fetching genres:", err)
+		return []turso.Content{}, err
+	}
 	if len(extractedData) == 0 {
 		log.Println("No titles extracted.")
 		return nil, errors.New("no titles to fetch")
 	}
 	for _, title := range extractedData {
-		fmt.Printf("Fetching data for: %s", title)
-
-		content, err := tmdb.FetchShowByTitle(title)
+		content, err := tmdb.FetchShowByTitle(title,provider)
 		if err != nil {
 			log.Printf("Error fetching title '%s': %v", title, err)
 			continue 
 		}
-		fmt.Println(content)
 		contentArr = append(contentArr, content)
 	}
 

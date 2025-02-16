@@ -67,24 +67,7 @@ func CreateContent(db *sql.DB, content Content) {
 	fmt.Println("Content inserted successfully:", content.ID)
 }
 
-// func CreateEmbeddings(db *sql.DB, embeddingObj Embeddings){
 
-// 	embeddingJSON, err := json.Marshal(embeddingObj.Vector)
-// 	if err != nil {
-// 		fmt.Fprintf(os.Stderr, "failed to convert vector to JSON: %v\n", err)
-// 		os.Exit(1)
-// 	}
-
-// 	result, err := db.Exec("INSERT INTO embeddings(content_id, vectors) VALUES(?, ?)", embeddingObj.Content_ID, embeddingJSON)
-// 	if err != nil {
-// 	  fmt.Fprintf(os.Stderr, "failed to execute query: %v", err)
-// 	  os.Exit(1)
-// 	}
-// 	rows, _ := result.RowsAffected()
-// 	if rows > 1 {
-// 		fmt.Println(" sucsess", rows)
-// 	}
-// }
 func CreateEmbeddings(db *sql.DB, embeddingObj Embeddings) {
 	// Ensure that the vector length is 1536
 	if len(embeddingObj.Vector) != 1536 {
