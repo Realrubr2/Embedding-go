@@ -2,13 +2,13 @@ package tmdb
 
 import (
 	"embeddings/turso"
+	"embeddings/util"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
 )
 
-// this wil be the function used -----------
 func FetchShowByTitle(movieTitle string, provider string) (turso.Content, error) {
 	encodedTitle := strings.ReplaceAll(movieTitle, " ", "%20")
 	url := fmt.Sprintf("%s/search/tv?query=%s&include_adult=true&language=en-US&page=1", BaseURL, encodedTitle)
@@ -39,7 +39,7 @@ func FetchShowByTitle(movieTitle string, provider string) (turso.Content, error)
 			Title:       show.Title,
 			Genres:      mapGenreIDToString(show.GenreIDs),
 			ReleaseDate: show.ReleaseDate,
-		Description: show.Overview,
+		Description: util.TranslateToDutch(show.Overview),
 		Provider: provider,
 		ImageLink:   show.Poster,
 		Type:        "show",

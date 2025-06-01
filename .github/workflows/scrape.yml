@@ -1,0 +1,35 @@
+name: Run Go Scraper
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    env:
+      TURSO_DATABASE_LINK: ${{ secrets.TURSO_DATABASE_LINK }}
+      TURSO_AUTH_KEY: ${{ secrets.TURSO_AUTH_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+      GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+      HBO: ${{ secrets.HBO }}
+      NETFLIX: ${ secrets.NETFLIX }}
+      DISNEY: ${{ secrets.DISNEY }}
+      AMAZON: ${{ secrets.AMAZON }}
+      APPLE: ${{ secrets.APPLE }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Install dependencies
+        run: go mod download
+
+      - name: Run scraper
+        run: go run ./scrape/scrape.go

@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
+	
 )
 
 func cleanHtml(html string) []string {
@@ -31,6 +32,7 @@ extractedData := []string{}
 		fmt.Println(extractedData)
 	return extractedData
 }
+
 func fetchHtml(url string)(string, error) {
 	resp, err:= http.Get(url)
 	if err != nil {
@@ -74,16 +76,17 @@ func scrapeTitles(html string) []string {
 
 
 
-func Scraper(db *sql.DB) {
+func ScrapeNetflix(db *sql.DB) {
+	env := util.LoadEnviroment()
 
-	URL := "https://www.wired.com/story/netflix-best-shows-this-week"
+	URL := env[5]
 	html, err := fetchHtml(URL)
 	if err != nil {
 		log.Fatal("Failed to fetch HTML:", err)
 	}
 	
 	scrapedTitles := scrapeTitles(html)
-	contentArr, err := ScrapeToContent(scrapedTitles, "netflix")
+	contentArr, err := ScrapeToContent(scrapedTitles, "Netflix")
 	if err != nil {		
 		log.Fatal("error in getting content", err)
 	}
@@ -92,4 +95,92 @@ func Scraper(db *sql.DB) {
 	if err != nil {
 		log.Fatal("err in placing in db", err)
 	}
+}
+
+
+func ScrapeHbo(db *sql.DB){
+	env := util.LoadEnviroment()
+	URL := env[4]
+	html, err := fetchHtml(URL)
+	if err != nil {
+		log.Fatal("Failed to fetch HTML:", err)
+	}
+	
+	scrapedTitles := scrapeTitles(html)
+	contentArr, err := ScrapeToContent(scrapedTitles, "HBO Max")
+	if err != nil {		
+		log.Fatal("error in getting content", err)
+	}
+	util.WriteJSONToFile("scrape",contentArr)
+	err = contentToTurso(db,contentArr)
+	if err != nil {
+		log.Fatal("err in placing in db", err)
+	}
+}
+func ScrapeAppleTV(db *sql.DB){
+	env := util.LoadEnviroment()
+	URL := env[7]
+	html, err := fetchHtml(URL)
+	if err != nil {
+		log.Fatal("Failed to fetch HTML:", err)
+	}
+	
+	scrapedTitles := scrapeTitles(html)
+	contentArr, err := ScrapeToContent(scrapedTitles, "Apple TV+")
+	if err != nil {		
+		log.Fatal("error in getting content", err)
+	}
+	util.WriteJSONToFile("scrape",contentArr)
+	err = contentToTurso(db,contentArr)
+	if err != nil {
+		log.Fatal("err in placing in db", err)
+	}
+}
+
+func ScrapeAmazon(db *sql.DB){
+	env := util.LoadEnviroment()
+	URL := env[8]
+	html, err := fetchHtml(URL)
+	if err != nil {
+		log.Fatal("Failed to fetch HTML:", err)
+	}
+	
+	scrapedTitles := scrapeTitles(html)
+	contentArr, err := ScrapeToContent(scrapedTitles, "Amazon Prime")
+	if err != nil {		
+		log.Fatal("error in getting content", err)
+	}
+	util.WriteJSONToFile("scrape",contentArr)
+	err = contentToTurso(db,contentArr)
+	if err != nil {
+		log.Fatal("err in placing in db", err)
+	}
+}
+func ScrapeDisneyPlus(db *sql.DB){
+	env := util.LoadEnviroment()
+	URL := env[6]
+	html, err := fetchHtml(URL)
+	if err != nil {
+		log.Fatal("Failed to fetch HTML:", err)
+	}
+	
+	scrapedTitles := scrapeTitles(html)
+	contentArr, err := ScrapeToContent(scrapedTitles, "Disney+")
+	if err != nil {		
+		log.Fatal("error in getting content", err)
+	}
+	util.WriteJSONToFile("scrape",contentArr)
+	err = contentToTurso(db,contentArr)
+	if err != nil {
+		log.Fatal("err in placing in db", err)
+	}
+}
+
+func ScrapeAll(db *sql.DB){
+	// the apple tv link is for movies!
+	ScrapeAppleTV(db)
+	// ScrapeAmazon(db)
+	// ScrapeHbo(db)
+	// ScrapeNetflix(db)
+	// ScrapeDisneyPlus(db)
 }

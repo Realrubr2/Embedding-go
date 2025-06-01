@@ -10,7 +10,6 @@ import (
 	_ "github.com/tursodatabase/libsql-client-go/libsql"
 )
 
-
 func main() {
 
     env := util.LoadEnviroment()
@@ -23,6 +22,8 @@ func main() {
       os.Exit(1)
     }
 
-    scrape.Scraper(db)
+    scrape.ScrapeAll(db)
+   
     defer db.Close()
 }
+
