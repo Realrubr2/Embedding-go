@@ -177,10 +177,9 @@ func ScrapeDisneyPlus(db *sql.DB){
 }
 
 func ScrapeAll(db *sql.DB){
-	// the apple tv link is for movies!
 	ScrapeAppleTV(db)
-	// ScrapeAmazon(db)
-	// ScrapeHbo(db)
-	// ScrapeNetflix(db)
-	// ScrapeDisneyPlus(db)
+	ScrapeAmazon(db)
+	ScrapeHbo(db)
+	ScrapeNetflix(db)
+	ScrapeDisneyPlus(db)
 }

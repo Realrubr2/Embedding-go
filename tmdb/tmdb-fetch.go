@@ -11,7 +11,7 @@ import (
 
 func FetchShowByTitle(movieTitle string, provider string) (turso.Content, error) {
 	encodedTitle := strings.ReplaceAll(movieTitle, " ", "%20")
-	url := fmt.Sprintf("%s/search/tv?query=%s&include_adult=true&language=en-US&page=1", BaseURL, encodedTitle)
+	url := fmt.Sprintf("%s/search/movie?query=%s&include_adult=true&language=en-US&page=1", BaseURL, encodedTitle)
 	data, err := makeRequest(url)
 	if err != nil {
 		return turso.Content{}, errors.New("fetching tmdb err")
@@ -42,7 +42,7 @@ func FetchShowByTitle(movieTitle string, provider string) (turso.Content, error)
 		Description: util.TranslateToDutch(show.Overview),
 		Provider: provider,
 		ImageLink:   show.Poster,
-		Type:        "show",
+		Type:        "movie",
 	}
 	
 	return content, nil
@@ -50,7 +50,7 @@ func FetchShowByTitle(movieTitle string, provider string) (turso.Content, error)
 
 
 func FetchGenresShow() error {
-	url := fmt.Sprintf("%s/genre/tv/list?language=en", BaseURL)
+	url := fmt.Sprintf("%s/genre/movie/list?language=en", BaseURL)
 	data, err := makeRequest(url)
 	if err != nil {
 		return err
