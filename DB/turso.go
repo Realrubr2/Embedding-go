@@ -1,17 +1,20 @@
-package database;
+package database
+
 import (
 	"database/sql"
-  "fmt"
-  "os"
-  "path/filepath"
+	"embeddings/util"
+	"fmt"
+	"os"
+	"path/filepath"
 
-  "github.com/tursodatabase/go-libsql"
+	"github.com/tursodatabase/go-libsql"
 )
+
 func RunTursoDB(){
 	dbName := "local.db"
-    primaryUrl := "https://embeddings-realrubr2.turso.io"
-    authToken := "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJxVHFEVk9KR0VlLWVqeG9vV1FBbTFRIn0.OQ1MLWN8ztbZQPe5H31E1tc3PAAFH6hBCTqqo7g_39SQfURH47qA2rHObsg64j75KcVhCMU83U6Ko7Jg7DTlAw"
-
+    env := util.LoadEnviroment()
+    primaryUrl := env[3]
+    authToken := env[2]
     dir, err := os.MkdirTemp("", "libsql-*")
     if err != nil {
         fmt.Println("Error creating temporary directory:", err)

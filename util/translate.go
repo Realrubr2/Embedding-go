@@ -1,32 +1,54 @@
 package util
 
-// import (
-// 	"context"
-// 	"fmt"
-// 	"log"
 
-// 	"cloud.google.com/go/translate"
-// 	"golang.org/x/text/language"
-// )
+import (
+	"context"
+	"fmt"
+	"log"
 
-// func TranslateDescription(){
-// 	ctx:= context.Background()
-// 	//open my client
-// 	client, err := translate.NewClient(ctx)
-// 	if err != nil {
-// 		// TODO handle error
-// 		log.Fatalf("there has been an err %s", err)
-// 	}
+	"github.com/sashabaranov/go-openai"
+)
 
-// 	dutchDescription, err := client.Translate(ctx, []string{"A South African Afrikaans soap opera. It is set in and around the fictional private hospital, Binneland Kliniek, in Pretoria, and the storyline follows the trials, trauma and tribulations of the staff and patients of the hospital."}, language.Dutch, &translate.Options{Source: language.English, Format: translate.Text})
-// 		if err != nil {
-// 			log.Fatalf("there has been an err %s", err)
-// 		}
-// 		fmt.Sprintln(dutchDescription[0].Text)
-// 		// close my client
-// 		if err := client.Close(); err != nil {
-// 		log.Fatalf("there has been an err %s", err)
-// 		// TODO: handle error.
-// 	}
+// translateToDutch using chatgpt to translate YES I KNOW but i have lots of gpt money
+// and try using google translate's api with there shitty cli and bullshit abstractions
+// If an error occurs, it returns the original text instead.
+func TranslateToDutch(text string) string {
+	enviromentvars := LoadEnviroment()
+	apiKey := enviromentvars[0]
+	if apiKey == "" {
+		log.Println("Warning: API key is missing. Returning original text.")
+		return text
+	}
 
-// }
+	client := openai.NewClient(apiKey)
+
+	resp, err := client.CreateChatCompletion(
+		context.Background(),
+		openai.ChatCompletionRequest{
+			Model: "gpt-4o-mini-2024-07-18",
+			Messages: []openai.ChatCompletionMessage{
+				{
+					Role:    "system",
+					Content: "You are a helpful translator that translates English text to Dutch.",
+				},
+				{
+					Role:    "user",
+					Content: fmt.Sprintf("Translate this to Dutch: %s", text),
+				},
+			},
+			MaxTokens: 1000,
+		},
+	)
+
+	if err != nil {
+		log.Println("Error during translation:", err)
+		return text 
+	}
+
+	if len(resp.Choices) > 0 {
+		return resp.Choices[0].Message.Content
+	}
+
+	log.Println("Warning: No translation received. Returning original text.")
+	return text 
+}

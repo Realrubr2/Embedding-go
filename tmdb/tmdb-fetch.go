@@ -2,52 +2,19 @@ package tmdb
 
 import (
 	"embeddings/turso"
+	"embeddings/util"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"strings"
 )
 
-// Fetches popular movies from TMDB
-func fetchPopularMovies() ([]Movie, error) {
-	url := fmt.Sprintf("%s/movie/popular?language=en-US&page=1", BaseURL)
+func FetchShowByTitle(movieTitle string, provider string) (turso.Content, error) {
+	encodedTitle := strings.ReplaceAll(movieTitle, " ", "%20")
+	url := fmt.Sprintf("%s/search/tv?query=%s&include_adult=true&language=en-US&page=1", BaseURL, encodedTitle)
 	data, err := makeRequest(url)
 	if err != nil {
-		return nil, err
-	}
-
-	var response struct {
-		Results []struct {
-			ID          int    `json:"id"`
-			Title       string `json:"title"`
-			GenreIDs    []int  `json:"genre_ids"`
-			ReleaseDate string `json:"release_date"`
-			Overview    string `json:"overview"`
-			Poster string 		`json:"poster_path"`
-		} `json:"results"`
-	}
-
-	if err := json.Unmarshal(data, &response); err != nil {
-		return nil, err
-	}
-
-	var movies []Movie
-	for _, r := range response.Results {
-		movies = append(movies, Movie{
-			ID:          r.ID,
-			Title:       r.Title,
-			Genres:      mapGenreIDsToNames(r.GenreIDs),
-			ReleaseDate: r.ReleaseDate,
-			Description: r.Overview,
-			ImageLink: r.Poster,
-		})
-	}
-	return movies, nil
-}
-
-func fetchPopularShows() ([]turso.Content, error) {
-	url := fmt.Sprintf("%s/tv/popular?language=en-US&page=1", BaseURL)
-	data, err :=makeRequest(url)
-	if err != nil {
-		return nil, err
+		return turso.Content{}, errors.New("fetching tmdb err")
 	}
 	var response struct {
 		Results []struct {
@@ -57,110 +24,32 @@ func fetchPopularShows() ([]turso.Content, error) {
 			ReleaseDate string `json:"first_air_date"`
 			Overview    string `json:"overview"`
 			Poster string 		`json:"poster_path"`
-		} `json:"results"`
-	}
-
-	if err := json.Unmarshal(data, &response); err != nil {
-		return nil, err
-	}
-
-
-	var tvShows []turso.Content
-	for _, r := range response.Results {
-		if r.Overview == "" { // Skip if Overview is empty
-			r.Overview = "Sorry we dont have a desription for this show"
+			} `json:"results"`
 		}
-		tvShows = append(tvShows, turso.Content{
-			ID:          r.ID,
-			Title:       r.Title,
-			Genres:      mapGenreIDToString(r.GenreIDs),
-			ReleaseDate: r.ReleaseDate,
-			Description: r.Overview,
-			ImageLink:   r.Poster,
-			Type:        "show",
-		})
+		if err := json.Unmarshal(data, &response); err != nil {
+			return turso.Content{}, err
+		}
+
+		if len(response.Results) == 0 {
+			return turso.Content{}, errors.New("no data found for this movie")
+		}
+		show := response.Results[0]
+		content := turso.Content{
+			ID:          show.ID,
+			Title:       show.Title,
+			Genres:      mapGenreIDToString(show.GenreIDs),
+			ReleaseDate: show.ReleaseDate,
+		Description: util.TranslateToDutch(show.Overview),
+		Provider: provider,
+		ImageLink:   show.Poster,
+		Type:        "show",
 	}
 	
-return tvShows, nil
+	return content, nil
 }
 
 
-// Fetches streaming provider info for a given movie ID
-func fetchMovieProvider(movieID int) (string, error) {
-	url := fmt.Sprintf("%s/movie/%d/watch/providers", BaseURL, movieID)
-	data, err := makeRequest(url)
-	if err != nil {
-		return "", err
-	}
-
-	var response map[string]interface{}
-	if err := json.Unmarshal(data, &response); err != nil {
-		return "", err
-	}
-
-	if results, ok := response["results"].(map[string]interface{}); ok {
-		if nl, found := results["NL"].(map[string]interface{}); found {
-			if providers, exists := nl["flatrate"].([]interface{}); exists && len(providers) > 0 {
-				if provider, valid := providers[0].(map[string]interface{}); valid {
-					if name, exists := provider["provider_name"].(string); exists {
-						return name, nil
-					}
-				}
-			}
-		}
-	}
-
-	return "Unknown", nil
-}
-
-func fetchShowProvider(showID int) (string, error) {
-	url := fmt.Sprintf("%s/tv/%d/watch/providers", BaseURL, showID)
-	data, err := makeRequest(url)
-	if err != nil {
-		return "", err
-	}
-
-	var response map[string]interface{}
-	if err := json.Unmarshal(data, &response); err != nil {
-		return "", err
-	}
-
-	if results, ok := response["results"].(map[string]interface{}); ok {
-		if nl, found := results["NL"].(map[string]interface{}); found {
-			if providers, exists := nl["flatrate"].([]interface{}); exists && len(providers) > 0 {
-				if provider, valid := providers[0].(map[string]interface{}); valid {
-					if name, exists := provider["provider_name"].(string); exists {
-						return name, nil
-					}
-				}
-			}
-		}
-	}
-
-	return "Unknown", nil
-}
-
-// Fetches and stores genre mappings from TMDB
-func fetchGenresMovie() error {
-	url := fmt.Sprintf("%s/genre/movie/list?language=en", BaseURL)
-	data, err := makeRequest(url)
-	if err != nil {
-		return err
-	}
-
-	var response struct {
-		Genres []Genre `json:"genres"`
-	}
-	if err := json.Unmarshal(data, &response); err != nil {
-		return err
-	}
-
-	for _, genre := range response.Genres {
-		genreMap[genre.ID] = genre.Name
-	}
-	return nil
-}
-func fetchGenresShow() error {
+func FetchGenresShow() error {
 	url := fmt.Sprintf("%s/genre/tv/list?language=en", BaseURL)
 	data, err := makeRequest(url)
 	if err != nil {

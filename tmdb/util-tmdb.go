@@ -1,34 +1,18 @@
 package tmdb
+
 import (
+	"embeddings/util"
 	"encoding/json"
 	"fmt"
 	"io"
-	"net/http"
 	"log"
+	"net/http"
 	"os"
 	"strings"
-	"embeddings/turso"
 )
 
-const APIKey = ""
+// const APIKey = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJjMzkyM2U1YmY3MzhhMTc5YTNlMzk3MjUzYjM0NmJkZSIsIm5iZiI6MTczNzIzMDQxOC43NTYsInN1YiI6IjY3OGMwODUyOGJjYTY2MWQwNTQzMWE2OSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.ioPqDhNGjeyIBThSJErhQ1JXJO1cnKn4jTfmoSnTXyA"
 
-func convertMovieToContent(movie Movie) turso.Content {
-	// Convert genre slice to a single comma-separated string
-	genreString := strings.Join(movie.Genres, ", ")
-
-	// Convert `Movie` to `Content`
-	content := turso.Content{
-		ID:          movie.ID,
-		Title:       movie.Title,
-		Genres:      genreString, // Store as a single string
-		Description: movie.Description,
-		ImageLink:   movie.ImageLink,
-		ReleaseDate: movie.ReleaseDate,
-		Provider:    movie.Provider,
-		Type:        "movie", // Explicitly setting the type
-	}
-	return content
-}
 //maps genreid to string it updates the mapgenreidstonames, it really calls for a refactor...
 func mapGenreIDToString(ids []int)string{
 	var names []string
@@ -41,22 +25,14 @@ func mapGenreIDToString(ids []int)string{
 	return genreString
 }
 
-// Maps genre IDs to genre names
-func mapGenreIDsToNames(ids []int) []string {
-	var names []string
-	for _, id := range ids {
-		if name, exists := genreMap[id]; exists {
-			names = append(names, name)
-		}
-	}
-	return names
-}
 
 // Makes an HTTP GET request and returns the response body
 func makeRequest(url string) ([]byte, error) {
+	env :=util.LoadEnviroment()
+	fmt.Sprintln(env[2])
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Add("accept", "application/json")
-	req.Header.Add("Authorization", "Bearer "+APIKey)
+	req.Header.Add("Authorization", "Bearer "+env[1])
 	
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {

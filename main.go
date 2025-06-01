@@ -2,23 +2,19 @@ package main
 
 import (
 	"database/sql"
-	"embeddings/tmdb"
-
-	// "embeddings/util"
+	"embeddings/scrape"
+	"embeddings/util"
 	"fmt"
 	"os"
 
 	_ "github.com/tursodatabase/libsql-client-go/libsql"
 )
 
-
-
 func main() {
 
-	// dbName := "local.db"
-    primaryUrl := "libsql://embeddings-realrubr2.turso.io"
-    authToken := ""
-
+    env := util.LoadEnviroment()
+    primaryUrl := env[3]
+    authToken := env[2]
     url := fmt.Sprintf("%s?authToken=%s", primaryUrl, authToken)
     db, err := sql.Open("libsql", url)
     if err != nil {
@@ -26,9 +22,8 @@ func main() {
       os.Exit(1)
     }
 
-	  // tmdb.Movies(db)
-    tmdb.Shows(db)
-    // util.TranslateDescription()
-  
+    scrape.ScrapeAll(db)
+   
     defer db.Close()
 }
+
