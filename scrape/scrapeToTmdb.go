@@ -11,7 +11,7 @@ import (
 )
 
 // this function takes the scraped titles and searches them in tmdb to get the content info
-func ScrapeToContent(extractedData []string, provider string) ([]turso.Content, error) {
+func ScrapeToContentShow(extractedData []string, provider string) ([]turso.Content, error) {
 	contentArr := []turso.Content{}
 	// first we need to fetch the genre to make a map of the id's
 	if err := tmdb.FetchGenresShow(); err != nil {
@@ -24,6 +24,30 @@ func ScrapeToContent(extractedData []string, provider string) ([]turso.Content, 
 	}
 	for _, title := range extractedData {
 		content, err := tmdb.FetchShowByTitle(title,provider)
+		if err != nil {
+			log.Printf("Error fetching title '%s': %v", title, err)
+			continue 
+		}
+		contentArr = append(contentArr, content)
+	}
+
+	return contentArr, nil
+}
+
+// this function takes the scraped titles and searches them in tmdb to get the content info
+func ScrapeToContentMovie(extractedData []string, provider string) ([]turso.Content, error) {
+	contentArr := []turso.Content{}
+	// first we need to fetch the genre to make a map of the id's
+	if err := tmdb.FetchGenresShow(); err != nil {
+		fmt.Println("Error fetching genres:", err)
+		return []turso.Content{}, err
+	}
+	if len(extractedData) == 0 {
+		log.Println("No titles extracted.")
+		return nil, errors.New("no titles to fetch")
+	}
+	for _, title := range extractedData {
+		content, err := tmdb.FetchMovieByTitle(title,provider)
 		if err != nil {
 			log.Printf("Error fetching title '%s': %v", title, err)
 			continue 
