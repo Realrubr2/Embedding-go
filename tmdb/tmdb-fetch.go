@@ -42,7 +42,7 @@ func FetchShowByTitle(movieTitle string, provider string) (turso.Content, error)
 		Description: util.TranslateToDutch(show.Overview),
 		Provider: provider,
 		ImageLink:   show.Poster,
-		Type:        "movie",
+		Type:        "show",
 	}
 	
 	return content, nil

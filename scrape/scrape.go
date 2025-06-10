@@ -86,7 +86,7 @@ func ScrapeNetflix(db *sql.DB) {
 	}
 	
 	scrapedTitles := scrapeTitles(html)
-	contentArr, err := ScrapeToContent(scrapedTitles, "Netflix")
+	contentArr, err := ScrapeToContentMovie(scrapedTitles, "Netflix")
 	if err != nil {		
 		log.Fatal("error in getting content", err)
 	}
@@ -107,7 +107,7 @@ func ScrapeHbo(db *sql.DB){
 	}
 	
 	scrapedTitles := scrapeTitles(html)
-	contentArr, err := ScrapeToContent(scrapedTitles, "HBO Max")
+	contentArr, err := ScrapeToContentMovie(scrapedTitles, "HBO Max")
 	if err != nil {		
 		log.Fatal("error in getting content", err)
 	}
@@ -126,7 +126,7 @@ func ScrapeAppleTV(db *sql.DB){
 	}
 	
 	scrapedTitles := scrapeTitles(html)
-	contentArr, err := ScrapeToContent(scrapedTitles, "Apple TV+")
+	contentArr, err := ScrapeToContentMovie(scrapedTitles, "Apple TV+")
 	if err != nil {		
 		log.Fatal("error in getting content", err)
 	}
@@ -146,7 +146,7 @@ func ScrapeAmazon(db *sql.DB){
 	}
 	
 	scrapedTitles := scrapeTitles(html)
-	contentArr, err := ScrapeToContent(scrapedTitles, "Amazon Prime")
+	contentArr, err := ScrapeToContentMovie(scrapedTitles, "Amazon Prime")
 	if err != nil {		
 		log.Fatal("error in getting content", err)
 	}
@@ -165,7 +165,7 @@ func ScrapeDisneyPlus(db *sql.DB){
 	}
 	
 	scrapedTitles := scrapeTitles(html)
-	contentArr, err := ScrapeToContent(scrapedTitles, "Disney+")
+	contentArr, err := ScrapeToContentMovie(scrapedTitles, "Disney+")
 	if err != nil {		
 		log.Fatal("error in getting content", err)
 	}
